@@ -5,3 +5,16 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+
+user = User.create({username: "bother7", name: "joe"})
+song = Song.create({title: "tik tok"})
+artist = Artist.create({name: "kesha"})
+playlist = Playlist.create({name: "my_playlist"})
+genre = Genre.create({name: "pop"})
+
+song.genres << genre
+song.playlists << playlist
+song.artist = artist
+user.playlists << playlist
+user.songs << song
