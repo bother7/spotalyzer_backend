@@ -7,7 +7,7 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 
-user = User.create({username: "bother7", name: "joe"})
+user = User.create({username: "bother7", name: "joe", password:"123"})
 song = Song.create({title: "tik tok"})
 artist = Artist.create({name: "kesha"})
 playlist = Playlist.create({name: "my_playlist"})
