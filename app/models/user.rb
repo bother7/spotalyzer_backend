@@ -5,22 +5,41 @@ class User < ApplicationRecord
   has_many :playlists, through: :user_playlists
   has_secure_password
 
-
+# sorta useless, not as good as initial main spotify auth or reauthorize
   def authorize
     @client_id, @client_secret = ENV['CLIENT_ID'], ENV['CLIENT_SECRET']
     request_body = { grant_type: 'client_credentials' }
     response = RestClient.post('https://accounts.spotify.com/api/token', request_body, auth_header)
-    @client_token = JSON.parse(response)['access_token']
-    self.access_token = @client_token
+    self.access_token = JSON.parse(response)['access_token']
     self.save
   end
 
   def auth_header
     authorization = Base64.strict_encode64 "#{@client_id}:#{@client_secret}"
-    { 'Authorization' => "Basic #{authorization}" }
+    { 'Authorization' => "Basic #{authorization}", :content_type => 'application/x-www-form-urlencoded' }
   end
 
   def reauthorize
+    @client_id, @client_secret = ENV['CLIENT_ID'], ENV['CLIENT_SECRET']
+    request_body = { grant_type: 'refresh_token', refresh_token: "#{self.refresh_token}" }
+    response = RestClient.post('https://accounts.spotify.com/api/token', request_body, auth_header)
+    self.access_token = JSON.parse(response)['access_token']
+    self.save
+  end
+
+  def mainspotifyauth (code)
+    @client_id, @client_secret = ENV['CLIENT_ID'], ENV['CLIENT_SECRET']
+    request_body = {grant_type: 'authorization_code', code: code, redirect_uri: 'http://localhost:3000/callback'}
+    response = RestClient.post('https://accounts.spotify.com/api/token', request_body, auth_header)
+    resp = JSON.parse(response)
+    self.access_token = resp['access_token']
+    self.refresh_token = resp['refresh_token']
+    self.save
+  end
+
+  def updated_token
+    self.reauthorize if ((Time.now - self.updated_at) > 3600)
+    self.access_token
   end
 
 end

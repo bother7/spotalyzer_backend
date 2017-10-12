@@ -2,6 +2,7 @@ class Api::V1::UsersController < ApplicationController
 
 
   def show
+
   end
 
   def create
@@ -20,9 +21,14 @@ class Api::V1::UsersController < ApplicationController
    end
  end
 
- # def spotify
- #   spotify_user = RSpotify::User.new(request.env['omniauth.auth'])
- #   byebug
- # end
+ def spotifyauth
+   code = params[:code]
+   @user = User.find_by(id: params[:user_id])
+   if @user && @user.mainspotifyauth(code)
+     render json: @user
+   else
+     render json: {status: "error", code: 402}
+   end
+ end
 
 end
