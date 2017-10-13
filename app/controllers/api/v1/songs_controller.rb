@@ -10,6 +10,7 @@ class Api::V1::SongsController < ApplicationController
     array = new_resp["#{filter}s"]["items"].map do |song|
       {title: song["name"]}
     end
+    byebug
     render json: array
   end
 
