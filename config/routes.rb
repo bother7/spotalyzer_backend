@@ -8,6 +8,7 @@ Rails.application.routes.draw do
       post '/login', to: 'users#login'
       post '/search', to: 'songs#search'
       post '/spotifyauth', to: 'users#spotifyauth'
+      get '/recent', to: 'songs#recent'
     end
   end
 

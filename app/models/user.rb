@@ -42,4 +42,15 @@ class User < ApplicationRecord
     self.access_token
   end
 
+
+  def recent_plays
+    authorization_header = { 'Authorization' => "Bearer #{updated_token}" }
+    response = RestClient.get("https://api.spotify.com/v1/me/player/recently-played", authorization_header)
+    new_resp = JSON.parse(response)
+    array = new_resp["items"].map do |song|
+      {title: song["track"]["name"], uri: song["track"]["uri"], artist: song["track"]["artists"][0]["name"] }
+    end
+  end
+
+
 end

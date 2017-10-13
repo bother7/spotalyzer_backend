@@ -77,6 +77,7 @@ ActiveRecord::Schema.define(version: 20171011180801) do
     t.datetime "updated_at", null: false
     t.string "access_token"
     t.string "refresh_token"
+    t.string "jwt_token"
   end
 
 end
