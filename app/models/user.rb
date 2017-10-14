@@ -38,19 +38,43 @@ class User < ApplicationRecord
   end
 
   def updated_token
-    self.reauthorize if ((Time.now - self.updated_at) > 3600)
+    self.reauthorize if ((Time.now - self.updated_at) > 3000)
     self.access_token
   end
 
 
   def recent_plays
+    if self.spotify_id == nil
+      fetchSpotifyId
+    end
     authorization_header = { 'Authorization' => "Bearer #{updated_token}" }
     response = RestClient.get("https://api.spotify.com/v1/me/player/recently-played", authorization_header)
     new_resp = JSON.parse(response)
-    array = new_resp["items"].map do |song|
-      {title: song["track"]["name"], uri: song["track"]["uri"], artist: song["track"]["artists"][0]["name"] }
+    @songs = new_resp["items"].map do |song|
+      @artist = Artist.find_or_create_by({name: song["track"]["artists"][0]["name"]})
+      Song.find_or_create_by({title: song["track"]["name"], uri: song["track"]["uri"], artist: @artist })
     end
   end
 
+  def my_playlists
+    authorization_header = { 'Authorization' => "Bearer #{updated_token}" }
+    response = RestClient.get("https://api.spotify.com/v1/me/playlists", authorization_header)
+    new_resp = JSON.parse(response)
+    # this should be creating playlist models
+    # array = new_resp["items"].map do |song|
+    #   {title: song["track"]["name"], uri: song["track"]["uri"], artist: song["track"]["artists"][0]["name"] }
+    # end
+    new_resp
+  end
+
+private
+
+  def fetchSpotifyId
+    authorization_header = { 'Authorization' => "Bearer #{updated_token}" }
+    response = RestClient.get("https://api.spotify.com/v1/me", authorization_header)
+    new_resp = JSON.parse(response)
+    self.spotify_id = new_resp["id"]
+    self.save
+  end
 
 end

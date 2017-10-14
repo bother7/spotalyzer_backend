@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171011180801) do
+ActiveRecord::Schema.define(version: 20171014192536) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,6 +53,7 @@ ActiveRecord::Schema.define(version: 20171011180801) do
     t.text "data", default: [], array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "uri"
   end
 
   create_table "user_playlists", force: :cascade do |t|
@@ -78,6 +79,7 @@ ActiveRecord::Schema.define(version: 20171011180801) do
     t.string "access_token"
     t.string "refresh_token"
     t.string "jwt_token"
+    t.string "spotify_id"
   end
 
 end
