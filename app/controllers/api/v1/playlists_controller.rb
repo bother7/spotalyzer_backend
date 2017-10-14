@@ -6,10 +6,13 @@ class Api::V1::PlaylistsController < ApplicationController
 
   def recent
     array = @user.my_playlists
-    if array
-    render json: array
+    if array == "0 Playlists"
+      render json: {error: "No User Playlists Exist", status: 422}
+    elsif array.size > 0
+      @playlists = array
+      render json: @playlists
     else
-    render json: {status: error, code: 400}
+      render json: {status: 400}
     end
   end
 
