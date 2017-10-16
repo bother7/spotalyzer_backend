@@ -4,7 +4,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       get '/playlists/recent', to: 'playlists#recent'
       get '/users/persist', to: 'users#persist'
-      get '/users/:id/authorized', to: 'users#isAuthorized?'
+      get '/users/checkauth', to: 'users#isAuthorized?'
       resources :users, only: [:create, :new, :index, :show]
       resources :songs, only: [:index, :show]
       resources :playlists

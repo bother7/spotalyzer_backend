@@ -8,13 +8,13 @@
 
 
 user = User.create({username: "bother7", name: "joe", password:"123"})
-song = Song.create({title: "tik tok"})
-artist = Artist.create({name: "kesha"})
-playlist = Playlist.create({name: "my_playlist"})
-genre = Genre.create({name: "pop"})
-
-song.genres << genre
-song.playlists << playlist
-song.artist = artist
-user.playlists << playlist
-user.songs << song
+# song = Song.create({title: "tik tok"})
+# artist = Artist.create({name: "kesha"})
+# playlist = Playlist.create({name: "my_playlist"})
+# genre = Genre.create({name: "pop"})
+#
+# song.genres << genre
+# song.playlists << playlist
+# song.artist = artist
+# user.playlists << playlist
+# user.songs << song

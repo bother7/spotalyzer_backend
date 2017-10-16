@@ -1,12 +1,11 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :find_user_via_jwt, only: [:persist]
+  before_action :find_user_via_jwt, only: [:persist, :isAuthorized?]
 
   def show
 
   end
 
   def isAuthorized?
-    @user = User.find_by(id: params[:id])
     if @user.access_token && @user.refresh_token
       render json: {status: "success"}
     else
@@ -17,7 +16,7 @@ class Api::V1::UsersController < ApplicationController
   def create
     @user = User.new(name: params[:name],username: params[:username], password: params[:password])
     if @user.save
-      token = encode_token({ user_id: user.id})
+      token = encode_token({ user_id: @user.id})
       @user.jwt_token = token
       @user.save
       render json: @user

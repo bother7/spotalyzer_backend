@@ -56,23 +56,7 @@ class User < ApplicationRecord
     end
   end
 
-  def my_playlists
-    authorization_header = { 'Authorization' => "Bearer #{updated_token}" }
-    response = RestClient.get("https://api.spotify.com/v1/me/playlists", authorization_header)
-    new_resp = JSON.parse(response)
-    if new_resp["items"].size == 0
-      "0 Playlists"
-    else
-      arr = new_resp["items"].map do |playlist|
-        byebug
-      end
-      arr
-    end
-    # this should be creating playlist models
-    # array = new_resp["items"].map do |song|
-    #   {title: song["track"]["name"], uri: song["track"]["uri"], artist: song["track"]["artists"][0]["name"] }
-    # end
-  end
+
 
 private
 
