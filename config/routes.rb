@@ -3,6 +3,8 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       get '/playlists/recent', to: 'playlists#recent'
+      get '/users/persist', to: 'users#persist'
+      get '/users/:id/authorized', to: 'users#isAuthorized?'
       resources :users, only: [:create, :new, :index, :show]
       resources :songs, only: [:index, :show]
       resources :playlists
@@ -10,7 +12,8 @@ Rails.application.routes.draw do
       post '/search', to: 'songs#search'
       post '/spotifyauth', to: 'users#spotifyauth'
       get '/recent', to: 'songs#recent'
-      
+
+
     end
   end
 

@@ -1,8 +1,17 @@
 class Api::V1::UsersController < ApplicationController
-
+  before_action :find_user_via_jwt, only: [:persist]
 
   def show
 
+  end
+
+  def isAuthorized?
+    @user = User.find_by(id: params[:id])
+    if @user.access_token && @user.refresh_token
+      render json: {status: "success"}
+    else
+      render json: {status: "error"}
+    end
   end
 
   def create
@@ -23,11 +32,17 @@ class Api::V1::UsersController < ApplicationController
      @user.save
      render json: @user
    else
-     render json: {status: "error", code: 401}
+     render json: {status: error, code: 401}
    end
  end
 
-
+ def persist
+   if @user
+     render json: @user
+   else
+     render json: {status: error}
+   end
+ end
 
  def spotifyauth
    code = params[:code]
@@ -35,7 +50,7 @@ class Api::V1::UsersController < ApplicationController
    if @user && @user.mainspotifyauth(code)
      render json: @user
    else
-     render json: {status: "error", code: 402}
+     render json: {status: error, code: 402}
    end
  end
 
