@@ -4,7 +4,7 @@ class Api::V1::PlaylistsController < ApplicationController
   def recent
     array = my_playlists
     if array == "0 Playlists"
-      render json: {status: "error", message: "No User Playlists Exist"}
+      render json: {status: 418, message: "No User Playlists Exist"}
     elsif array.size > 0
       @playlists = array
       render json: @playlists.where({display: true})
@@ -24,14 +24,14 @@ class Api::V1::PlaylistsController < ApplicationController
     @user.playlists << @playlist
     authorization_header = { 'Authorization' => "Bearer #{@user.updated_token}", 'Content-Type' => 'application/json' }
     request_body = {name: @playlist.name}.to_json
-    response = RestClient.post("https://api.spotify.com/v1/users/#{@user.spotify_id}/playlists", request_body, authorization_header)
+    response = RestClient.post("https://api.spotify.com/v1/me/playlists", request_body, authorization_header)
     new_resp = JSON.parse(response)
     if response
       @playlist.uri = new_resp["uri"]
       @playlist.save
       render json: @playlist
     else
-      render json: {status: "error", message: "uh oh spaghettios"}
+      render json: {status: 418, message: "uh oh spaghettios"}
     end
   end
 
@@ -43,7 +43,9 @@ class Api::V1::PlaylistsController < ApplicationController
     render json: @playlists.where({display: true})
   end
 
+  def patch
 
+  end
 
 private
 
@@ -55,7 +57,7 @@ private
       "0 Playlists"
     else
       arr = new_resp["items"].map do |playlist|
-        @playlist = Playlist.find_or_create_by({uri: playlist["uri"], name: playlist["name"]})
+        @playlist = Playlist.find_or_create_by({uri: playlist["uri"], name: playlist["name"], tracks_url: playlist["tracks"]["href"]})
         if !@user.playlists.include?(@playlist)
           @user.playlists << @playlist
         end
@@ -67,7 +69,8 @@ private
 
   def playlist_tracks
     authorization_header = { 'Authorization' => "Bearer #{@user.updated_token}" }
-    response = RestClient.get("https://api.spotify.com/v1/users/#{@user.spotify_id}/playlists/#{@playlist.spotify_id}/tracks", authorization_header)
+    url = @playlist.tracks_url || "https://api.spotify.com/v1/users/#{@user.spotify_id}/playlists/#{@playlist.spotify_id}/tracks"
+    response = RestClient.get("#{url}", authorization_header)
     new_resp = JSON.parse(response)
       if new_resp["items"].length != 0
         @playlist.songs = []
@@ -78,7 +81,7 @@ private
         end
         render json: @playlist.songs
       else
-        render json: {status: "error", message: "no songs"}
+        render json: {status: 418, message: "no songs"}
       end
   end
 

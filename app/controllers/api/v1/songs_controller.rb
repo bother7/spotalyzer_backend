@@ -5,7 +5,7 @@ class Api::V1::SongsController < ApplicationController
     @search = params[:search]
     filter = params[:searchFilter]
     authorization_header = { 'Authorization' => "Bearer #{@user.updated_token}" }
-    response = RestClient.get("https://api.spotify.com/v1/search?q=#{@search}&type=#{filter}", authorization_header)
+    response = RestClient.get("https://api.spotify.com/v1/search?q=#{@search}&type=#{filter}&limit=50", authorization_header)
     new_resp = JSON.parse(response)
     # only works for track right now, need to add artist and playlist
     mapTrack(filter, new_resp)
