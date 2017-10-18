@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :find_user_via_jwt, only: [:persist, :isAuthorized?]
+  before_action :find_user_via_jwt, only: [:persist, :isAuthorized?, :spotifyauth]
 
   def show
 
@@ -45,7 +45,6 @@ class Api::V1::UsersController < ApplicationController
 
  def spotifyauth
    code = params[:code]
-   @user = User.find_by(id: decoded_token[0]["user_id"]) if decoded_token[0]["user_id"]
    if @user && @user.mainspotifyauth(code)
      render json: @user
    else

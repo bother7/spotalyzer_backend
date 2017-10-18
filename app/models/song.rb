@@ -7,6 +7,10 @@ class Song < ApplicationRecord
   has_many :song_genres
   has_many :genres, through: :song_genres
 
+  def uri
+    "spotify:track:#{self.spotify_id}"
+  end
+
 
   def self.play
     s = Spotilocal::Client.new port: 4382

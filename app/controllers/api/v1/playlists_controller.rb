@@ -93,7 +93,7 @@ private
         @playlist.songs = []
         new_resp["items"].map do |song|
           @artist = Artist.find_or_create_by(name: song["track"]["artists"][0]["name"])
-          thisSong = Song.find_or_create_by({title: song["track"]["name"], uri: song["track"]["uri"], artist: @artist})
+          thisSong = Song.find_or_create_by({title: song["track"]["name"], spotify_id: song["track"]["id"], artist: @artist})
           @playlist.songs << thisSong
         end
         render json: @playlist.songs
@@ -108,7 +108,6 @@ private
       url = "https://api.spotify.com/v1/users/#{@user.spotify_id}/playlists/#{@playlist.spotify_id}/tracks"
       playlist_uri_array = playlist_array.map {|playlist| playlist.uri}
       request_body = {uris: playlist_uri_array}.to_json
-      byebug
       response = RestClient.put("#{url}", request_body, authorization_header)
       new_resp = JSON.parse(response)
         if new_resp["snapshot_id"]

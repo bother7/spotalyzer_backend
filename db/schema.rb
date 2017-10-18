@@ -56,7 +56,7 @@ ActiveRecord::Schema.define(version: 20171017140114) do
     t.text "data", default: [], array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uri"
+    t.string "spotify_id"
   end
 
   create_table "user_playlists", force: :cascade do |t|
