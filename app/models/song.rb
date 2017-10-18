@@ -8,5 +8,9 @@ class Song < ApplicationRecord
   has_many :genres, through: :song_genres
 
 
-  
+  def self.play
+    s = Spotilocal::Client.new port: 4382
+    byebug
+  end
+
 end
