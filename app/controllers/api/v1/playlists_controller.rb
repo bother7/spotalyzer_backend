@@ -114,6 +114,7 @@ private
           thisSong = Song.find_or_create_by({title: song["track"]["name"], spotify_id: song["track"]["id"], artist: @artist})
           @playlist.songs << thisSong
         end
+        @user.playlists << @playlist if !@user.playlists.include?(@playlist)
         render json: @playlist.songs
       else
         render json: {status: 418, message: "no songs"}
