@@ -12,8 +12,8 @@ Rails.application.routes.draw do
       post '/search', to: 'songs#search'
       post '/spotifyauth', to: 'users#spotifyauth'
       get '/recent', to: 'songs#recent'
-
-
+      post '/saved', to: 'playlists#editsaved'
+      get '/saved', to: 'playlists#showsaved'
     end
   end
 

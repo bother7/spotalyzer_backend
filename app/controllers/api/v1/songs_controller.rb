@@ -9,16 +9,12 @@ class Api::V1::SongsController < ApplicationController
     new_resp = JSON.parse(response)
     # only works for track right now, need to add artist and playlist
     mapTrack(filter, new_resp)
-    render json: @songs
   end
-
 
   def recent
     @songs = @user.recent_plays
     render json: @songs
   end
-
-
 
   private
 
@@ -26,14 +22,17 @@ class Api::V1::SongsController < ApplicationController
     if filter == "track"
       @songs = new_resp["#{filter}s"]["items"].map do |song|
         @artist = Artist.find_or_create_by(name: song["artists"][0]["name"])
-        Song.find_or_create_by({title: song["name"], uri: song["uri"], artist: @artist})
+        Song.find_or_create_by({title: song["name"], spotify_id: song["id"], artist: @artist})
       end
+      render json: @songs
+    elsif filter == "playlist"
+      @playlists = new_resp["#{filter}s"]["items"].map do |playlist|
+        Playlist.find_or_create_by({name: playlist["name"], uri: playlist["uri"], tracks_url: playlist["tracks"]["href"]})
+      end
+      render json: @playlists
     end
+
   end
-
-
-
-
 
 
 

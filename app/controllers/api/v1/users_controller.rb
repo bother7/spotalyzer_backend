@@ -16,6 +16,8 @@ class Api::V1::UsersController < ApplicationController
   def create
     @user = User.new(name: params[:name],username: params[:username], password: params[:password])
     if @user.save
+      playlist = Playlist.create(name: "InternalSavedPlaylist", display: false)
+      user.playlists << playlist
       token = encode_token({ user_id: @user.id})
       @user.jwt_token = token
       @user.save

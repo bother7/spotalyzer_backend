@@ -37,6 +37,24 @@ class Api::V1::PlaylistsController < ApplicationController
     playlist_tracks
   end
 
+  def showsaved
+    @playlist = @user.playlists.where(name: "InternalSavedPlaylist")[0]
+    render json: @playlist.songs
+  end
+
+  def editsaved
+    @playlist = @user.playlists.where(name: "InternalSavedPlaylist")[0]
+    tracks = params[:song_array].map do |object|
+      song = Song.find_by(id: object["id"])
+    end
+    @playlist.songs = tracks
+    if @playlist.save
+      render json: {status: "success"}
+    else
+      render json: {status: "error"}
+    end
+  end
+
 
   def create
     @playlist = Playlist.new({name: params[:name]})
