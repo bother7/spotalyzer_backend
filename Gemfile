@@ -4,6 +4,9 @@ git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
   "https://github.com/#{repo_name}.git"
 end
+
+
+gem 'newrelic_rpm'
 gem 'spotilocal'
 gem 'rest-client', '~> 1.7'
 gem 'active_model_serializers', '0.10.0'
