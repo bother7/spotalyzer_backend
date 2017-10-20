@@ -44,9 +44,7 @@ class User < ApplicationRecord
 
 
   def recent_plays
-    if self.spotify_id == nil
-      fetchSpotifyId
-    end
+    fetchSpotifyId if self.spotify_id == nil
     authorization_header = { 'Authorization' => "Bearer #{updated_token}" }
     response = RestClient.get("https://api.spotify.com/v1/me/player/recently-played", authorization_header)
     new_resp = JSON.parse(response)

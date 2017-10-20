@@ -8,7 +8,21 @@ class Song < ApplicationRecord
   has_many :genres, through: :song_genres
 
   def uri
-    "spotify:track:#{self.spotify_id}"
+    if self.spotify_id
+      "spotify:track:#{self.spotify_id}"
+    else
+      "song unavailable"
+    end
+  end
+
+  def analysis(user)
+    authorization_header = { 'Authorization' => "Bearer #{user.updated_token}" }
+    response = RestClient.get("https://api.spotify.com/v1/audio-analysis/#{self.spotify_id}", authorization_header)
+    new_resp = JSON.parse(response)
+
+    self.data = new_resp["segments"]
+
+    self.save
   end
 
 

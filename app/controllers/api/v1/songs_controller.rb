@@ -1,5 +1,5 @@
 class Api::V1::SongsController < ApplicationController
-  before_action :find_user_via_jwt, only: [:search, :recent]
+  before_action :find_user_via_jwt, only: [:search, :recent, :show]
 
   def search
     @search = params[:search]
@@ -15,6 +15,14 @@ class Api::V1::SongsController < ApplicationController
     @songs = @user.recent_plays
     render json: @songs
   end
+
+
+  def show
+    song = Song.find_by(id: params[:id])
+    song.analysis(@user)
+    render json: song.data
+  end
+
 
   private
 

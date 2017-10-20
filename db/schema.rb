@@ -53,7 +53,7 @@ ActiveRecord::Schema.define(version: 20171017140114) do
   create_table "songs", force: :cascade do |t|
     t.string "title"
     t.integer "artist_id"
-    t.text "data", default: [], array: true
+    t.jsonb "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "spotify_id"
