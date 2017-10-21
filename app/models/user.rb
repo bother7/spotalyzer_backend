@@ -43,15 +43,18 @@ class User < ApplicationRecord
   end
 
 
-  def recent_plays
+  def recent_plays(playlist)
     fetchSpotifyId if self.spotify_id == nil
     authorization_header = { 'Authorization' => "Bearer #{updated_token}" }
     response = RestClient.get("https://api.spotify.com/v1/me/player/recently-played", authorization_header)
     new_resp = JSON.parse(response)
-    @songs = new_resp["items"].map do |song|
-      @artist = Artist.find_or_create_by({name: song["track"]["artists"][0]["name"]})
-      Song.find_or_create_by({title: song["track"]["name"], spotify_id: song["track"]["id"], artist: @artist })
+    songs = new_resp["items"].map do |song|
+      artist = Artist.find_or_create_by({name: song["track"]["artists"][0]["name"]})
+      Song.find_or_create_by({title: song["track"]["name"], spotify_id: song["track"]["id"], artist: artist })
     end
+    playlist.songs = songs
+    playlist.save
+    playlist.songs
   end
 
 

@@ -21,14 +21,18 @@ class Api::V1::PlaylistsController < ApplicationController
   end
 
   def recent
-    array = my_playlists
-    if array == "0 Playlists"
-      render json: {status: 418, message: "No User Playlists Exist"}
-    elsif array.size > 0
-      @playlists = array
-      render json: @playlists.where({display: true})
+    if (Time.now - @user.updated_at < 600)
+      render json: @user.playlists.where({display: true})
     else
-      render json: {status: 400}
+      array = my_playlists
+      if array == "0 Playlists"
+        render json: {status: 418, message: "No User Playlists Exist"}
+      elsif array.size > 0
+        @playlists = array
+        render json: @playlists.where({display: true})
+      else
+        render json: {status: 400}
+      end
     end
   end
 
@@ -110,8 +114,8 @@ private
       if new_resp["items"].length != 0
         @playlist.songs = []
         new_resp["items"].map do |song|
-          @artist = Artist.find_or_create_by(name: song["track"]["artists"][0]["name"])
-          thisSong = Song.find_or_create_by({title: song["track"]["name"], spotify_id: song["track"]["id"], artist: @artist})
+          artist = Artist.find_or_create_by(name: song["track"]["artists"][0]["name"])
+          thisSong = Song.find_or_create_by({title: song["track"]["name"], spotify_id: song["track"]["id"], artist: artist})
           @playlist.songs << thisSong
         end
         @user.playlists << @playlist if !@user.playlists.include?(@playlist)

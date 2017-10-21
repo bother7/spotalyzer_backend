@@ -7,13 +7,17 @@ class Api::V1::SongsController < ApplicationController
     authorization_header = { 'Authorization' => "Bearer #{@user.updated_token}" }
     response = RestClient.get("https://api.spotify.com/v1/search?q=#{@search}&type=#{filter}&limit=50", authorization_header)
     new_resp = JSON.parse(response)
-    # only works for track right now, need to add artist and playlist
     mapTrack(filter, new_resp)
   end
 
   def recent
-    @songs = @user.recent_plays
-    render json: @songs
+    @playlist = @user.playlists.where(name: "InternalRecentPlaylist")[0]
+    if ((Time.now - @playlist.updated_at) < 600 && @playlist.songs.length > 0)
+      render json: @playlist.songs
+    else
+      @songs = @user.recent_plays(@playlist)
+      render json: @songs
+    end
   end
 
 
@@ -29,8 +33,8 @@ class Api::V1::SongsController < ApplicationController
   def mapTrack (filter, new_resp)
     if filter == "track"
       @songs = new_resp["#{filter}s"]["items"].map do |song|
-        @artist = Artist.find_or_create_by(name: song["artists"][0]["name"])
-        Song.find_or_create_by({title: song["name"], spotify_id: song["id"], artist: @artist})
+        artist = Artist.find_or_create_by(name: song["artists"][0]["name"])
+        Song.find_or_create_by({title: song["name"], spotify_id: song["id"], artist: artist})
       end
       render json: @songs
     elsif filter == "playlist"
