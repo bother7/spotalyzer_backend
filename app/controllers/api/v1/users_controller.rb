@@ -2,7 +2,6 @@ class Api::V1::UsersController < ApplicationController
   before_action :find_user_via_jwt, only: [:persist, :isAuthorized?, :spotifyauth]
 
   def show
-
   end
 
   def isAuthorized?

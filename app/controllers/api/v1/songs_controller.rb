@@ -24,7 +24,7 @@ class Api::V1::SongsController < ApplicationController
   def show
     song = Song.find_by(id: params[:id])
     song.analysis(@user)
-    render json: song.data
+    render json: {data:song.data, uri:song.uri}
   end
 
 

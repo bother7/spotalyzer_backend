@@ -16,13 +16,13 @@ class Song < ApplicationRecord
   end
 
   def analysis(user)
-    authorization_header = { 'Authorization' => "Bearer #{user.updated_token}" }
-    response = RestClient.get("https://api.spotify.com/v1/audio-analysis/#{self.spotify_id}", authorization_header)
-    new_resp = JSON.parse(response)
-
-    self.data = new_resp["segments"]
-
-    self.save
+    if !self.data
+      authorization_header = { 'Authorization' => "Bearer #{user.updated_token}" }
+      response = RestClient.get("https://api.spotify.com/v1/audio-analysis/#{self.spotify_id}", authorization_header)
+      new_resp = JSON.parse(response)
+      self.data = new_resp["segments"]
+      self.save
+    end
   end
 
 
