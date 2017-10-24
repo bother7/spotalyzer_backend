@@ -1,5 +1,5 @@
 class Api::V1::SongsController < ApplicationController
-  before_action :find_user_via_jwt, only: [:search, :recent, :show]
+  before_action :find_user_via_jwt, only: [:search, :recent, :show, :recommendation]
 
   def search
     @search = params[:search]
@@ -12,14 +12,39 @@ class Api::V1::SongsController < ApplicationController
 
   def recent
     @playlist = @user.playlists.where(name: "InternalRecentPlaylist")[0]
-    if ((Time.now - @playlist.updated_at) < 600 && @playlist.songs.length > 0)
-      render json: @playlist.songs
+    if ((Time.now - @playlist.updated_at) < 300 && @playlist.songs.length > 0)
+      render json: @playlist.songs.order(updated_at: :desc)
     else
       @songs = @user.recent_plays(@playlist)
       render json: @songs
     end
   end
 
+  def recommendation
+    @playlist = @user.playlists.where(name: "InternalRecommendedPlaylist")[0]
+    if ((Time.now - @playlist.updated_at) < 180 && @playlist.songs.length > 0)
+      render json: @playlist.songs
+    else
+      playlist = @user.playlists.where(name: "InternalRecentPlaylist")[0]
+      seeds = playlist.songs.order(updated_at: :desc).limit(5)
+      seeds = seeds.map {|song| song.spotify_id}
+
+      authorization_header = { 'Authorization' => "Bearer #{@user.updated_token}" }
+      response = RestClient.get("https://api.spotify.com/v1/recommendations?seed_tracks=#{seeds.join(',')}&market=US", authorization_header)
+      new_resp = JSON.parse(response)
+      @songs = new_resp["tracks"].map do |song|
+        artist = Artist.find_or_create_by(name: song["artists"][0]["name"])
+        newSong = Song.find_or_create_by({title: song["name"], spotify_id: song["id"], artist: artist})
+        album = song["album"]["images"].find {|album| album["height"] == 64}["url"]
+        newSong.artwork_url = album || null
+        newSong.save
+        newSong
+      end
+      @playlist.songs = []
+      @playlist.songs = @songs
+      render json: @songs
+    end
+  end
 
   def show
     song = Song.find_by(id: params[:id])

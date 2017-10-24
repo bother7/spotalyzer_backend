@@ -2,6 +2,7 @@ class Api::V1::UsersController < ApplicationController
   before_action :find_user_via_jwt, only: [:persist, :isAuthorized?, :spotifyauth]
 
   def show
+    
   end
 
   def isAuthorized?
@@ -17,9 +18,11 @@ class Api::V1::UsersController < ApplicationController
     if @user.save
       playlist = Playlist.create({name: "InternalSavedPlaylist", display: false})
       playlist1 = Playlist.create({name: "InternalRecentPlaylist", display: false})
+      playlist2 = Playlist.create({name: "InternalRecommendedPlaylist", display: false})
       @user.playlists << playlist
       @user.playlists << playlist1
-      token = encode_token({ user_id: @user.id})
+      @user.playlists << playlist2
+      token = encode_token({user_id: @user.id})
       @user.jwt_token = token
       @user.save
       render json: @user
@@ -29,7 +32,7 @@ class Api::V1::UsersController < ApplicationController
   def login
    @user = User.find_by(username: params[:username])
    if @user && @user.authenticate(params[:password])
-     token = encode_token({ user_id: @user.id})
+     token = encode_token({user_id: @user.id})
      @user.jwt_token = token
      @user.save
      render json: @user

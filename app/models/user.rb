@@ -52,6 +52,7 @@ class User < ApplicationRecord
       artist = Artist.find_or_create_by({name: song["track"]["artists"][0]["name"]})
       Song.find_or_create_by({title: song["track"]["name"], spotify_id: song["track"]["id"], artist: artist })
     end
+    playlist.songs = []
     playlist.songs = songs
     playlist.save
     playlist.songs

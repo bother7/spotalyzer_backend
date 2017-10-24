@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       get '/recent', to: 'songs#recent'
       post '/saved', to: 'playlists#editsaved'
       get '/saved', to: 'playlists#showsaved'
+      get '/recommendation', to: 'songs#recommendation'
     end
   end
 
