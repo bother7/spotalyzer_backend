@@ -65,10 +65,11 @@ class Api::V1::PlaylistsController < ApplicationController
     @user.playlists << @playlist
     authorization_header = { 'Authorization' => "Bearer #{@user.updated_token}", 'Content-Type' => 'application/json' }
     request_body = {name: @playlist.name}.to_json
-    response = RestClient.post("https://api.spotify.com/v1/me/playlists", request_body, authorization_header)
+    response = RestClient.post("https://api.spotify.com/v1/users/#{@user.spotify_id}/playlists", request_body, authorization_header)
     new_resp = JSON.parse(response)
     if response
       @playlist.uri = new_resp["uri"]
+      @playlist.tracks_url = new_resp["tracks"]["href"]
       @playlist.save
       render json: @playlist
     else

@@ -6,4 +6,6 @@ class SongSerializer < ActiveModel::Serializer
     object.artist.name
   end
 
+  
+
 end

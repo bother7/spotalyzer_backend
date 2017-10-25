@@ -27,9 +27,12 @@ class Api::V1::SongsController < ApplicationController
       render json: @playlist.songs
     else
       playlist = @user.playlists.where(name: "InternalRecentPlaylist")[0]
-      seeds = playlist.songs.order(updated_at: :desc).limit(5)
+      if playlist.songs.length > 5
+        seeds = playlist.songs.order(updated_at: :desc).limit(5)
+      else
+        seeds = playlist.songs.order(updated_at: :desc)
+      end
       seeds = seeds.map {|song| song.spotify_id}
-
       authorization_header = { 'Authorization' => "Bearer #{@user.updated_token}" }
       response = RestClient.get("https://api.spotify.com/v1/recommendations?seed_tracks=#{seeds.join(',')}&market=US&limit=10", authorization_header)
       new_resp = JSON.parse(response)
