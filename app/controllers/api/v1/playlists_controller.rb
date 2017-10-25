@@ -21,7 +21,7 @@ class Api::V1::PlaylistsController < ApplicationController
   end
 
   def recent
-    if (Time.now - @user.updated_at < 600)
+    if ((Time.now - @user.updated_at < 300) && (@user.playlists.length > 3))
       render json: @user.playlists.where({display: true})
     else
       array = my_playlists
