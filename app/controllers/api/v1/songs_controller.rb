@@ -24,36 +24,37 @@ class Api::V1::SongsController < ApplicationController
   def recommendation
     @playlist = @user.playlists.where(name: "InternalRecommendedPlaylist")[0]
     if @playlist.songs.length == 0
-      return
-    end
-    if ((Time.now - @playlist.updated_at) < 180 && @playlist.songs.length > 0)
-      render json: @playlist.songs
+      render json: {status: "error"}
     else
-      playlist = @user.playlists.where(name: "InternalRecentPlaylist")[0]
-      if playlist.songs.length > 5
-        seeds = playlist.songs.order(updated_at: :desc).limit(5)
+      if ((Time.now - @playlist.updated_at) < 180 && @playlist.songs.length > 0)
+        render json: @playlist.songs
       else
-        seeds = playlist.songs.order(updated_at: :desc)
-      end
-      seeds = seeds.map {|song| song.spotify_id}
-      authorization_header = { 'Authorization' => "Bearer #{@user.updated_token}" }
-      response = RestClient.get("https://api.spotify.com/v1/recommendations?seed_tracks=#{seeds.join(',')}&market=US&limit=10", authorization_header)
-      new_resp = JSON.parse(response)
-      @songs = new_resp["tracks"].map do |song|
-        artist = Artist.find_or_create_by(name: song["artists"][0]["name"])
-        newSong = Song.find_or_create_by({title: song["name"], spotify_id: song["id"], artist: artist})
-        album = song["album"]["images"].find {|album| album["height"] == 64}
-        if album && album["url"]
-          newSong.artwork_url = album["url"]
+        playlist = @user.playlists.where(name: "InternalRecentPlaylist")[0]
+        if playlist.songs.length > 5
+          seeds = playlist.songs.order(updated_at: :desc).limit(5)
         else
-          newSong.artwork_url = nil
+          seeds = playlist.songs.order(updated_at: :desc)
         end
-        newSong.save
-        newSong
+        seeds = seeds.map {|song| song.spotify_id}
+        authorization_header = { 'Authorization' => "Bearer #{@user.updated_token}" }
+        response = RestClient.get("https://api.spotify.com/v1/recommendations?seed_tracks=#{seeds.join(',')}&market=US&limit=10", authorization_header)
+        new_resp = JSON.parse(response)
+        @songs = new_resp["tracks"].map do |song|
+          artist = Artist.find_or_create_by(name: song["artists"][0]["name"])
+          newSong = Song.find_or_create_by({title: song["name"], spotify_id: song["id"], artist: artist})
+          album = song["album"]["images"].find {|album| album["height"] == 64}
+          if album && album["url"]
+            newSong.artwork_url = album["url"]
+          else
+            newSong.artwork_url = nil
+          end
+          newSong.save
+          newSong
+        end
+        @playlist.songs = []
+        @playlist.songs = @songs
+        render json: @songs
       end
-      @playlist.songs = []
-      @playlist.songs = @songs
-      render json: @songs
     end
   end
 
