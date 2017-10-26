@@ -29,7 +29,7 @@ class User < ApplicationRecord
 
   def mainspotifyauth (code)
     @client_id, @client_secret = ENV['CLIENT_ID'], ENV['CLIENT_SECRET']
-    request_body = {grant_type: 'authorization_code', code: code, redirect_uri: 'http://localhost:3000/callback'}
+    request_body = {grant_type: 'authorization_code', code: code, redirect_uri: 'https://spotalyzer-frontend.herokuapp.com/callback'}
     response = RestClient.post('https://accounts.spotify.com/api/token', request_body, auth_header)
     resp = JSON.parse(response)
     self.access_token = resp['access_token']
