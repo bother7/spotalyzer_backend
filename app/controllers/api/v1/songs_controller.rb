@@ -17,7 +17,11 @@ class Api::V1::SongsController < ApplicationController
       render json: localSongs
     else
       @songs = @user.recent_plays(@playlist)
-      render json: @songs
+      if @songs
+        render json: @songs
+      else
+        render json: {status: "error"}
+      end
     end
   end
 
@@ -30,7 +34,6 @@ class Api::V1::SongsController < ApplicationController
       if ((Time.now - @playlist.updated_at) < 180 && @playlist.songs.length > 0)
         render json: @playlist.songs
       else
-
         if playlist.songs.length > 5
           seeds = playlist.songs.order(updated_at: :desc).limit(5)
         else
