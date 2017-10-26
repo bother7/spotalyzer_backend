@@ -23,13 +23,14 @@ class Api::V1::SongsController < ApplicationController
 
   def recommendation
     @playlist = @user.playlists.where(name: "InternalRecommendedPlaylist")[0]
-    if @playlist.songs.length == 0
+    playlist = @user.playlists.where(name: "InternalRecentPlaylist")[0]
+    if playlist.songs.length == 0
       render json: {status: "error"}
     else
       if ((Time.now - @playlist.updated_at) < 180 && @playlist.songs.length > 0)
         render json: @playlist.songs
       else
-        playlist = @user.playlists.where(name: "InternalRecentPlaylist")[0]
+
         if playlist.songs.length > 5
           seeds = playlist.songs.order(updated_at: :desc).limit(5)
         else
