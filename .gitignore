@@ -15,3 +15,6 @@
 ./config/secrets.yml
 .byebug_history
 .env
+
+# Ignore encrypted secrets key file.
+config/secrets.yml.key
