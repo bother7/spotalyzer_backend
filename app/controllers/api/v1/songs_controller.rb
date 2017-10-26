@@ -23,6 +23,9 @@ class Api::V1::SongsController < ApplicationController
 
   def recommendation
     @playlist = @user.playlists.where(name: "InternalRecommendedPlaylist")[0]
+    if @playlist.songs.length == 0
+      return
+    end
     if ((Time.now - @playlist.updated_at) < 180 && @playlist.songs.length > 0)
       render json: @playlist.songs
     else
