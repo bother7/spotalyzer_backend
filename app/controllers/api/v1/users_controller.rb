@@ -32,7 +32,7 @@ class Api::V1::UsersController < ApplicationController
   def login
    @user = User.find_by(username: params[:username])
    if @user && @user.authenticate(params[:password])
-     if @user == "demo" || @user == "demo_data"
+     if @user.username == "demo" || @user.username == "demo_data"
        render json: @user
      else
       token = encode_token({user_id: @user.id})
