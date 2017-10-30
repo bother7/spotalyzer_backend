@@ -7,6 +7,8 @@ A web app for the Spotify API with data visualization of currently playing music
 * [Homepage](https://spotalyzer-frontend.herokuapp.com/) - Main page, click demo to login
 * [Data Visualization Demo](https://spotalyzer-frontend.herokuapp.com/demo) - Click here to get sent to a sample data visualization page
 
+![alt text](https://raw.githubusercontent.com/bother7/spotalyzer-frontend/master/public/demo.png)
+
 ## Navigating
 
 Most Spotify functions are available. Search for songs, manage playlists. Update playlists on Spotify. Save songs for later. You can login with the demo account, or create your own account and link it to your spotify.
